@@ -19,6 +19,7 @@
  */
 
 #include "ns3/test.h"
+#include <limits>
 #include "ns3/simulator.h"
 #include "ns3/socket-factory.h"
 #include "ns3/udp-socket-factory.h"

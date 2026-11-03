@@ -29,6 +29,7 @@
 #define PIE_QUEUE_DISC_H
 
 #include "ns3/queue-disc.h"
+#include <limits>
 #include "ns3/nstime.h"
 #include "ns3/boolean.h"
 #include "ns3/data-rate.h"

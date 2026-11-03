@@ -1,1 +1,2 @@
-ns-o-ran commit: 
+ns-o-ran commit: 0efbfaf370350c170beb249951e5c349d7f89b34 (tag v1.0)
+contrib/oran-interface: 2db7a07 (o-ran-sc/sim-ns3-o-ran-e2, branch h-release; not tracked in this repo)

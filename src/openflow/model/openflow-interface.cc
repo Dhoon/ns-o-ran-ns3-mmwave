@@ -18,6 +18,7 @@
 #ifdef NS3_OPENFLOW
 
 #include "openflow-interface.h"
+#include <limits>
 #include "openflow-switch-net-device.h"
 
 namespace ns3 {

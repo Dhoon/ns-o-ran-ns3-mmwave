@@ -15,6 +15,7 @@
  */
 
 #include <ctime>
+#include <limits>
 #include <sys/time.h>
 
 #include <cstdio>

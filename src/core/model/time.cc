@@ -20,6 +20,7 @@
  * TimeStep support by Emmanuelle Laprise <emmanuelle.laprise@bluekazoo.ca>
  */
 #include "nstime.h"
+#include <limits>
 #include "abort.h"
 #include "system-mutex.h"
 #include "log.h"

@@ -17,6 +17,7 @@
  */
 
 #include "ns3/log.h"
+#include <limits>
 #include "ns3/boolean.h"
 #include "ns3/uinteger.h"
 #include "ns3/buffer.h"

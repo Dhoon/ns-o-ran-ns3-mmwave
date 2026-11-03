@@ -17,6 +17,7 @@
  */
 
 #include "ns3/abort.h"
+#include <limits>
 #include "ns3/enum.h"
 #include "ns3/uinteger.h"
 #include "ns3/trace-source-accessor.h"

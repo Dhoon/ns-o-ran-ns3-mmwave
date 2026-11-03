@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <limits>
 #include <iterator>
 #include <sstream>
 #include <vector>

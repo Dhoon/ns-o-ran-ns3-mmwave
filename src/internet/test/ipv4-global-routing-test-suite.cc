@@ -15,6 +15,7 @@
  */
 
 #include <vector>
+#include <limits>
 #include "ns3/boolean.h"
 #include "ns3/config.h"
 #include "ns3/inet-socket-address.h"

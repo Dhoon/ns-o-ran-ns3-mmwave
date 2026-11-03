@@ -20,6 +20,7 @@
  *  Sascha Alexander Jopen <jopen@cs.uni-bonn.de>
  */
 #include "lr-wpan-phy.h"
+#include <limits>
 #include "lr-wpan-lqi-tag.h"
 #include "lr-wpan-spectrum-signal-parameters.h"
 #include "lr-wpan-spectrum-value-helper.h"

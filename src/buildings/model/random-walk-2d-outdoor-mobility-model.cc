@@ -20,6 +20,7 @@
  * Author: Michele Polese <michele.polese@gmail.com>
  */
 #include "random-walk-2d-outdoor-mobility-model.h"
+#include <limits>
 #include "ns3/enum.h"
 #include "ns3/double.h"
 #include "ns3/uinteger.h"

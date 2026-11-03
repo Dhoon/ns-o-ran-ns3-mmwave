@@ -23,6 +23,7 @@
 
 
 #include <gsl/gsl_cdf.h>
+#include <limits>
 #include <gsl/gsl_histogram.h>
 #include <gsl/gsl_sf_zeta.h>
 #include <ctime>

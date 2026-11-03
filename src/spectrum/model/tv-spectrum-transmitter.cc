@@ -19,6 +19,7 @@
  */
 
 #include <ns3/log.h>
+#include <limits>
 #include <ns3/simulator.h>
 #include <ns3/enum.h>
 #include <ns3/uinteger.h>

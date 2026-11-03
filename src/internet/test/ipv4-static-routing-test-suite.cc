@@ -17,6 +17,7 @@
 // End-to-end tests for Ipv4 static routing
 
 #include "ns3/boolean.h"
+#include <limits>
 #include "ns3/config.h"
 #include "ns3/inet-socket-address.h"
 #include "ns3/internet-stack-helper.h"

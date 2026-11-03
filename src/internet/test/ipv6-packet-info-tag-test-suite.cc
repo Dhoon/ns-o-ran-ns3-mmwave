@@ -23,6 +23,7 @@
 //-----------------------------------------------------------------------------
 
 #include "ns3/test.h"
+#include <limits>
 #include "ns3/ipv6-address.h"
 #include "ns3/ipv6-packet-info-tag.h"
 #include "ns3/log.h"

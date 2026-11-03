@@ -24,6 +24,7 @@
 */
 
 #include "packet-tag-list.h"
+#include <limits>
 #include "tag-buffer.h"
 #include "tag.h"
 #include "ns3/fatal-error.h"

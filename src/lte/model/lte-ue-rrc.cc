@@ -28,6 +28,7 @@
  */
 
 #include "lte-ue-rrc.h"
+#include <limits>
 
 #include <ns3/fatal-error.h>
 #include <ns3/log.h>

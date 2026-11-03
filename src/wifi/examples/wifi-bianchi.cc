@@ -25,6 +25,7 @@
 // to support 11n/ac/ax, including frame aggregation settings.
 
 #include <fstream>
+#include <limits>
 #include "ns3/log.h"
 #include "ns3/config.h"
 #include "ns3/gnuplot.h"

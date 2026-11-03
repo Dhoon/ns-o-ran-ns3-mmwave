@@ -27,6 +27,7 @@
 #define DYNAMIC_QUEUE_LIMITS_H
 
 #include "queue-limits.h"
+#include <limits>
 #include "ns3/nstime.h"
 #include "ns3/traced-value.h"
 #include <limits.h>

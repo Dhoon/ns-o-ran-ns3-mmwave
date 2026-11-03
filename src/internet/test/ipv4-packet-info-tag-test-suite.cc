@@ -23,6 +23,7 @@
 //-----------------------------------------------------------------------------
 
 #include <string>
+#include <limits>
 
 #include "ns3/test.h"
 #include "ns3/ipv4-packet-info-tag.h"

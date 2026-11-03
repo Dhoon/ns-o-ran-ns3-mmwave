@@ -19,6 +19,7 @@
  */
 
 #include "ns3/lollipop-counter.h"
+#include <limits>
 
 using namespace ns3;
 

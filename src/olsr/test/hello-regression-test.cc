@@ -19,6 +19,7 @@
  */
 
 #include <vector>
+#include <limits>
 #include "hello-regression-test.h"
 #include "ns3/simulator.h"
 #include "ns3/random-variable-stream.h"
