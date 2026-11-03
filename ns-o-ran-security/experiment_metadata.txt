@@ -3,10 +3,18 @@ ns-o-ran-ns3-mmwave      : 0efbfaf370350c170beb249951e5c349d7f89b34  (tag v1.0, 
 contrib/oran-interface   : 2db7a07  (o-ran-sc/sim-ns3-o-ran-e2, branch h-release)
                            master is CMake-only and does not build with the v1.0 waf tree;
                            h-release (2022-10-14) is the last waf (wscript) version.
-colosseum-near-rt-ric    : e3161c1  (branch ns-o-ran)
+colosseum-near-rt-ric    : e3161c1  (branch ns-o-ran, 2023-12-01)
+                           v1.0-era commit is b2c6545 (2022-11-02). Kept HEAD on purpose:
+                           the 5 later commits only fix an e2term crash (RIC_INTERFACE lines
+                           removed from setup-ric-bronze.sh) and indication delivery in
+                           xapp-sm-connector. No traffic-steering logic changes.
+                           RIC images: prebuilt wineslab/colo-ran-*:bronze from Docker Hub;
+                           the o-ran-sc-bldr-* builder images are not needed.
 oran-e2sim               : 951b3e9  (branch develop), installed as e2sim-dev 1.0.0
-ns-o-ran-scp-ric-app-kpimon : 317afb5  (branch ns-o-ran)
-ns-o-ran-xapp-rc         : 3747d2e  (branch ns-o-ran)
+                           Differs from e2sim tag v1.0 (275f58f) by 4 lines in 3 files,
+                           all compiler-compatibility fixes (missing includes, signal handler type).
+kpimon / rc xApp repos   : not used. Their ns-o-ran branches were created in 2023-05,
+                           after ns-O-RAN v1.0; the v1.0 baseline uses the RIC repo's sample-xapp.
 host                     : Windows 11 + WSL2 Ubuntu 22.04.5 LTS, GCC 11.4.0, Python 3.10.12
 build system in v1.0     : waf (ns-3.33 base, no ns3 launcher)
 
