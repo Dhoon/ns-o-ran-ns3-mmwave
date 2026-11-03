@@ -1,0 +1,9 @@
+# Cloned component versions (guide section 14)
+ns-o-ran-ns3-mmwave      : 0efbfaf370350c170beb249951e5c349d7f89b34  (tag v1.0, branch temporal-misalignment-baseline)
+contrib/oran-interface   : cf1a4bc  (o-ran-sc/sim-ns3-o-ran-e2, master)
+colosseum-near-rt-ric    : e3161c1  (branch ns-o-ran)
+oran-e2sim               : 951b3e9  (branch develop)
+ns-o-ran-scp-ric-app-kpimon : 317afb5  (branch ns-o-ran)
+ns-o-ran-xapp-rc         : 3747d2e  (branch ns-o-ran)
+host                     : Windows 11 + WSL2 Ubuntu 22.04.5 LTS
+build system in v1.0     : waf (no ns3 launcher)
