@@ -78,3 +78,7 @@ X2Stats.txt
 LteDlRsrpSinrStats.txt
 RlcAmBufferSize.txt
 LteUlSinrStats.txt
+
+# experiment trace outputs (regenerated each run)
+*.log
+ns-o-ran-security/scripts/terminals/*.bat text eol=crlf
