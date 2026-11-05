@@ -13,20 +13,20 @@
   the xApp receives (that is aggregated per indicationPeriodicity and, in reduced mode,
   a subset; the sample xApp does not pretty-print it).
 
-## Next: find the Go xApp KPM -> state -> control code points (guide 16, P1-P5)
-The attack goes into the authorized xApp's state construction. The running xApp is the
-RIC sample xApp (Go), container `sample-xapp-24`, source under the RIC repo. Locate:
-- P1 KPM reception callback (where a RIC Indication enters the xApp)
-- P2 KPM decoding (E2SM-KPM -> SINR/PRB/throughput values)
-- P3 state construction (features assembled for the decision) <-- attack surface A
-- P4 model inference / decision (state -> target cell)
-- P5 control transmission (action -> E2/RC control)
+- P1-P5 located (2026-11-03). Full details: `xapp_code_points_P1_P5.md`.
+  * The xApp is NOT Go: C++ connector (hw_xapp_main) + Python agent (run_xapp.py),
+    linked by TCP 127.0.0.1:4200. It is a pure relay.
+  * P1 = msgs_proc.cc:164/245 (C++) -> run_xapp.py:17 (Python). P5 = xapp.cc:347.
+  * P2/P3/P4 do NOT exist: inner E2SM-KPM is forwarded still ASN.1-encoded, no state,
+    no model. Attack surface A must be built (kpm_buffer/state_builder/policy_wrapper).
+  * Python agent likely drops all KPM (utf-8 decode of binary -> ''); log file is 0 bytes.
+  * C++ control path sends a plain string, not E2SM-RC -> ns-3 TS handover won't parse it.
 
-Candidate sources to read first (Go):
-- RIC sample xApp: colosseum-near-rt-ric/setup/sample-xapp/ (hw_xapp_main)
-  and xapp-sm-connector (the connector built into the container at /home/xapp-sm-connector)
-- For reference on decode: ns-o-ran-scp-ric-app-kpimon/control/{e2sm,control}.go (kept as
-  reference even though not used in the baseline)
-
-Goal of next session: identify exactly where the received KPM becomes the decision state,
-so the feature-wise temporal-misalignment (state_builder.py logic) can be wired in there.
+## Next: choose integration path (see options A/B/C in xapp_code_points_P1_P5.md)
+- A (recommended): Python xApp. Fix socket framing, decode E2SM-KPM in Python
+  (asn1tools + ASN.1 from contrib/oran-interface), plug in state_builder/policy_wrapper,
+  make C++ encode a proper E2SM-RC TS control (imsi, target cell).
+- B (fastest first result): file loop. ns-3 ReadControlFile reads
+  ts_actions_for_ns3.csv (timestamp,imsi,targetCellId) every 1 ms; KPM from ns-3 traces.
+- First concrete check either way: run a sim and watch `docker logs sample-xapp-24`
+  to confirm problem #1 (KPM dropped in Python).
