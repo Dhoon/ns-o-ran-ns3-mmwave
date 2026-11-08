@@ -24,7 +24,10 @@
 #include <limits>
 #include <vector>
 
-#define USE_FREE_LIST 1
+// Disabled for ns-o-ran paper reproduction: with the free list every allocation is rounded up to
+// the largest tag list ever seen (g_maxSize), which made memory grow without bound under
+// full-buffer load. Exact-size allocation below; tag content and behavior are unchanged.
+// #define USE_FREE_LIST 1
 #define FREE_LIST_SIZE 1000
 #define OFFSET_MAX (std::numeric_limits<int32_t>::max())
 

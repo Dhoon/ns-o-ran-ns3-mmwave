@@ -427,7 +427,7 @@ main (int argc, char *argv[])
     case 0:
       centerFrequency = 850e6;
       bandwidth = 20e6;
-      isd = 1000;
+      isd = 1700; // paper (Lacava et al. TMC 2024, Sec. 5.1); released code had 1000
       numAntennasMcUe = 1;
       numAntennasMmWave = 1;
       dataRate = (dataRateFromConf == 0 ? "1.5Mbps" : "4.5Mbps");
