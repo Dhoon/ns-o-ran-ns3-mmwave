@@ -1,0 +1,104 @@
+# ACTIVE: paper reproduction on ns-O-RAN master (since 2026-11-05)
+# Baseline paper: Lacava et al., IEEE TMC 2024 (arXiv 2209.14171). Spec: docs/paper_reproduction_spec.md
+ns-o-ran-ns3-mmwave      : 8c42089d0859396589f0dbb5a4dca29327ba756c  (master, 2025-03-18 "Fix column name (#160)")
+                           work branch: paper-repro-master (created from 8c42089d)
+                           Reason for master: v1.0 scenario-one is the 2021 1+4 node, fixed-UE scenario;
+                           the paper scenario (1+7, trafficModel=3, random walk, configuration 0/1)
+                           exists only on master (ns-3.38 base, CMake).
+contrib/oran-interface   : cf1a4bce7b40b09a80abff05e7a30c113d36353b  (o-ran-sc/sim-ns3-o-ran-e2 master,
+                           detached HEAD; has CMakeLists.txt). Separate repo, ignored by main repo.
+oran-e2sim               : 951b3e9  (branch develop), installed as e2sim-dev 1.0.0 (/usr/local/lib/libe2sim.a)
+colosseum-near-rt-ric    : e3161c1  (branch ns-o-ran) -- unchanged, only needed for the RIC RL phase
+host                     : Windows 11 + WSL2 Ubuntu 22.04.5 LTS, 16 cores, 15 GB RAM
+toolchain                : GCC 11.4.0, CMake 3.22.1, Python 3.10.12
+build                    : ./ns3 configure --build-profile=optimized --enable-examples (SQLite ON, tests OFF)
+                           CMAKE_BUILD_TYPE=release, output build/optimized/
+                           binary: build/optimized/scratch/ns3.38.rc1-scenario-one-optimized
+build-v1.0-waf/          : old v1.0 waf build tree, left untouched on purpose (rebuild if v1.0 is needed)
+
+# Source patches on top of master 8c42089d (uncommitted until noted)
+1. scratch/scenario-one.cc:430 (2026-11-09)
+   configuration 0 (850 MHz): isd 1000 -> 1700, as in the paper (Sec. 5.1).
+   isd is also the UE drop radius (SetRho), so the UE area grows too.
+2. src/network/model/byte-tag-list.cc:27 (2026-11-09)
+   `#define USE_FREE_LIST 1` commented out (ns-3 core, not ns-O-RAN code).
+   Why: with the free list, Allocate() rounds every byte-tag list up to g_maxSize, the largest
+   list ever seen in the run (never decreases). Under full-buffer load RLC concatenates many
+   tagged SDUs, g_maxSize reaches KBs, and every 1-2 tag list then costs ~1.7-3 KB.
+   Memory grew superlinearly (heaptrack ByteTagList::Add: 35.5 MB at 1 s sim, 146.8 MB at 2 s).
+   Effect: exact-size allocation only; tag content/count/readers unchanged.
+   Verified (6 UEs/gNB, 2 s, traces+E2 off): peak RSS 313 -> 168 MB, all 15 output files
+   byte-identical to the unpatched run. With traces+E2 on (J vs A): all 62 output files identical
+   (KPM files identical except the wall-clock-based timestamp column).
+
+# Scenario choices (paper vs code, see docs/paper_reproduction_spec.md section 2)
+configuration            : 0 = 850 MHz, ISD 1700 m (patched, see Source patches 1)
+                           1 = 3.5 GHz, ISD 1000 m
+channel                  : UMi Street Canyon (as in paper Fig. 5 and code; paper text says UMa)
+ues                      : per gNB, 6/9/12/15/18 -> 42/63/84/105/126 total
+trafficModel             : 3 (25% each: 20 Mbit/s full buffer, 3 Mbit/s bursty, 750 kbit/s, 150 kbit/s)
+mobility                 : --minSpeed=2 --maxSpeed=4 (random walk)
+E2 period                : --indicationPeriodicity=0.1
+outageThreshold          : -5.0 dB
+baselines                : RAN RRM = --handoverMode=Threshold --hoSinrDifference=3
+                           SON1    = --handoverMode=FixedTtt   (FixedTttValue 110 ms, default)
+                           SON2    = --handoverMode=DynamicTtt (25-150 ms, defaults)
+                           RIC RL  = --handoverMode=NoAuto + control (later phase)
+offline run notes        : scenario-one always opens --controlFileName (default ts_actions_for_ns3.csv)
+                           in the cwd; create it empty before an offline baseline run, else exit 250.
+                           Run with ./ns3 run --no-build --cwd=<output dir> so outputs go per run.
+
+# Smoke run 2026-11-05 (results/raw/smoke_threshold) -- ISD 1000 m, before both patches
+cmd  : scenario-one --configuration=0 --ues=6 --trafficModel=3 --handoverMode=Threshold
+       --hoSinrDifference=3 --outageThreshold=-5.0 --minSpeed=2 --maxSpeed=4
+       --indicationPeriodicity=0.1 --enableE2FileLogging=1 --enableTraces=1 --simTime=2 --RngRun=1
+out  : exit 0, 42 UEs, 8 cells, 103 HO start / 103 HO end, 0 UE failures, control file 0 bytes
+cost : 8 min 19 s wall for 2 s simulated, max RSS ~388 MB (single core)
+
+# Runtime scaling probe 2026-11-05 (results/raw/timing, same flags, Threshold, 5 runs in parallel)
+# ISD 1000 m, before both patches. RSS numbers are obsolete after patch 2; wall times roughly hold.
+UEs/gNB simTime  wall      maxRSS
+ 6      1 s      5:00      0.21 GB
+ 6      4 s      27:07     0.68 GB
+12      2 s      44:59     0.97 GB
+18      1 s      46:04     0.97 GB
+18      4 s      2:42:48   2.69 GB
+-> wall ~ linear in simTime, ~ UEs^1.5-1.6 (approx. 420 / 1350 / 2335 s per simulated s at 6/12/18).
+-> RSS grows with simTime (~0.6 GB per sim-s at 18 UEs/gNB); limits parallel runs at 126 UEs.
+
+# Memory investigation 2026-11-09 (results/raw/memprobe; 6 UEs/gNB, ISD 1700, Threshold, 2 s)
+run                          change                          peak RSS   note
+A_tr1_e21 / B / C / D        traces and E2 logging on/off    313-316 MB traces/E2 not the cause
+E_buf1                       --bufferSize=1 (RLC cap 1 MB)   278 MB     RLC tx cap not the cause
+F_tm2                        --trafficModel=2 (no full buf)  149 MB     growth tied to full-buffer DL
+G_perPckToLTE0               --ns3::McEnbPdcp::perPckToLTE=0 388 MB     inconclusive: LTE-leg RLC volume
+                                                                        unchanged, setting likely not applied
+heaptrack / heaptrack_2s     heap profile 1 s / 2 s          -          ByteTagList::Add 35.5 -> 146.8 MB
+I_nofreelist                 patch 2, traces+E2 off          168 MB     outputs byte-identical to D
+J_nofreelist_tr1_e21         patch 2, traces+E2 on           171 MB     vs A: 39 files byte-identical, 23 KPM
+                                                                        files identical except column 1
+-> KPM column 1 (timestamp) = wall-clock ms at run start + sim ms, so it differs between runs
+   (A vs J offset 8,607,871 ms = time between the two runs). Use sim time = ts - first ts.
+-> Wall time barely changes with patch 2; runtime is compute-bound (3GPP channel, slots), not memory.
+
+# ---------------------------------------------------------------------------
+# HISTORY: v1.0 setup (2026-10/11, branch temporal-misalignment-baseline) -- no longer active
+ns-o-ran-ns3-mmwave      : 0efbfaf370350c170beb249951e5c349d7f89b34  (tag v1.0, branch temporal-misalignment-baseline)
+contrib/oran-interface   : 2db7a07  (o-ran-sc/sim-ns3-o-ran-e2, branch h-release)
+                           master is CMake-only and does not build with the v1.0 waf tree;
+                           h-release (2022-10-14) is the last waf (wscript) version.
+colosseum-near-rt-ric    : e3161c1  (branch ns-o-ran, 2023-12-01)
+                           v1.0-era commit is b2c6545 (2022-11-02). Kept HEAD on purpose:
+                           the 5 later commits only fix an e2term crash (RIC_INTERFACE lines
+                           removed from setup-ric-bronze.sh) and indication delivery in
+                           xapp-sm-connector. No traffic-steering logic changes.
+                           RIC images: prebuilt wineslab/colo-ran-*:bronze from Docker Hub;
+                           the o-ran-sc-bldr-* builder images are not needed.
+oran-e2sim               : 951b3e9  (branch develop), installed as e2sim-dev 1.0.0
+                           Differs from e2sim tag v1.0 (275f58f) by 4 lines in 3 files,
+                           all compiler-compatibility fixes (missing includes, signal handler type).
+kpimon / rc xApp repos   : not used. Their ns-o-ran branches were created in 2023-05,
+                           after ns-O-RAN v1.0; the v1.0 baseline uses the RIC repo's sample-xapp.
+build system in v1.0     : waf (ns-3.33 base, no ns3 launcher)
+v1.0 build patches       : 30 source files got `#include <limits>` (GCC 11); ./waf configure
+                           --enable-examples --enable-tests (SQLite stats enabled)

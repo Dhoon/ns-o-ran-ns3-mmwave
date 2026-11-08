@@ -1,0 +1,40 @@
+# B1 uniform stale state (guide sections 20, 24)
+experiment_id: seed001_uniform_lag
+seed: 1
+
+nsoran:
+  commit: "0efbfaf370350c170beb249951e5c349d7f89b34"
+  scenario: "scenario-one"
+  use_case: "traffic_steering"
+
+e2:
+  indication_period_ms: 100
+  handover_mode: "NoAuto"
+  outage_threshold: -1000
+  control_path: "ts_actions_for_ns3.csv"
+  e2_term_ip: "REPLACE_WITH_ACTUAL_E2TERM_IP"
+
+ue:
+  count: 3
+  min_speed_mps: 2.0
+  max_speed_mps: 4.0
+
+traffic:
+  model: 3
+  configuration: 0
+
+attack:
+  enabled: true
+  mode: "uniform"                 # B1
+  uniform_k: 1                    # sweep: 1, 2, 3, 5 (guide section 20)
+
+policy:
+  checkpoint: "TBD_locate_victim_model"
+  hash: "TBD"
+
+buffer:
+  history_len: 32
+
+output:
+  provenance_log: "logs/decision_provenance_seed001_uniform_lag.csv"
+  metrics_log: "results/raw/metrics_seed001_uniform_lag.csv"

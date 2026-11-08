@@ -1,0 +1,39 @@
+# B0 aligned baseline (guide sections 19, 24, 34)
+experiment_id: seed001_baseline
+seed: 1
+
+nsoran:
+  commit: "0efbfaf370350c170beb249951e5c349d7f89b34"   # ns-o-ran v1.0
+  scenario: "scenario-one"
+  use_case: "traffic_steering"   # run-simulations.sh use_case=1
+
+e2:
+  indication_period_ms: 100       # TS: indicationPeriodicity=0.1 s
+  handover_mode: "NoAuto"
+  outage_threshold: -1000
+  control_path: "ts_actions_for_ns3.csv"
+  e2_term_ip: "REPLACE_WITH_ACTUAL_E2TERM_IP"
+
+ue:
+  count: 3                        # run-simulations.sh ues=3 (raise for paper)
+  min_speed_mps: 2.0
+  max_speed_mps: 4.0
+
+traffic:
+  model: 3                        # mixed setup
+  configuration: 0                # NR 850 MHz, low traffic
+
+attack:
+  enabled: false
+  mode: "aligned"                 # B0
+
+policy:
+  checkpoint: "TBD_locate_victim_model"   # guide section 15
+  hash: "TBD"
+
+buffer:
+  history_len: 32
+
+output:
+  provenance_log: "logs/decision_provenance_seed001_baseline.csv"
+  metrics_log: "results/raw/metrics_seed001_baseline.csv"

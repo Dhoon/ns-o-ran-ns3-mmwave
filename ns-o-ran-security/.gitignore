@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+logs/*.csv
+results/raw/*
+results/processed/*
+!logs/.gitkeep
+!results/raw/.gitkeep
+!results/processed/.gitkeep
