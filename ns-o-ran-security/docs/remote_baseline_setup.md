@@ -25,7 +25,7 @@ TMC 2024 논문 재현용 baseline 시뮬레이션(RAN RRM / SON1 / SON2)을 새
 
 ## 1. 새 PC 요구사항
 
-- Ubuntu 22.04 (네이티브 또는 WSL2). 다른 배포판은 검증 안 함.
+- Ubuntu 22.04 (네이티브 또는 WSL2) 또는 24.04 (5절 GCC 13 옵션 필요). 다른 배포판은 검증 안 함.
 - **물리 코어 수가 속도를 좌우한다.** 실행 하나가 코어 하나를 쓴다.
 - RAM: 동시 실행 수 × 약 1~1.5 GB + 여유 3 GB (UE 84명 × 30 s 메모리는 아직 미측정, 추정치).
 - 디스크: 결과 약 50 GB + 빌드 약 10 GB.
@@ -41,6 +41,8 @@ sudo apt-get install -y build-essential g++ git cmake python3 \
 ```
 
 `time`은 `/usr/bin/time`(실행 시간·메모리 기록)용이다. 빠지면 스크립트가 실패한다.
+sudo 비밀번호는 지금 로그인한 계정의 비밀번호다. 계정에 sudo 권한이 없으면 관리자 계정으로
+설치해도 된다(패키지는 시스템 전체에 설치됨).
 기준 PC 버전: GCC 11.4.0, CMake 3.22.1, Python 3.10.12.
 
 ## 3. e2sim 설치
@@ -81,11 +83,16 @@ cd ..
 
 ```bash
 cd ~/research/nsoran/ns-o-ran-ns3-mmwave
-./ns3 configure --build-profile=optimized --enable-examples
+./ns3 configure --build-profile=optimized --out=build/optimized --enable-examples
 ./ns3 build scenario-one
 ls build/optimized/scratch/ns3.38.rc1-scenario-one-optimized    # 있어야 함
 ```
 
+- `--out=build/optimized`를 빼면 실행 파일이 `build/scratch/`에 생겨 스크립트가 못 찾는다.
+- **GCC 13 이상(Ubuntu 24.04 등)**: ns-3.38 일부 헤더에 `#include <cstdint>`가 빠져 있어
+  `'uint8_t' is not a member of 'std'` 오류로 빌드가 실패한다. 소스를 고치지 말고 configure를
+  `CXXFLAGS="-include cstdint" ./ns3 configure --build-profile=optimized --out=build/optimized --enable-examples`
+  로 하면 된다(Ubuntu 24.04 / GCC 13.3에서 확인, 2026-11-09).
 - 반드시 이 PC에서 빌드한다. optimized 프로필은 `-march=native`라서 다른 CPU에서 만든
   바이너리를 복사해 오면 안 돌 수 있다.
 - 확인용: `grep -E "CMAKE_BUILD_TYPE|NS3_LOG|NS3_ASSERT" cmake-cache/CMakeCache.txt`

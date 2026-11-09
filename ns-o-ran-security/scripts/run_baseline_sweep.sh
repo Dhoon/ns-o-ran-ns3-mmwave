@@ -10,7 +10,7 @@ OUT="${OUT:-$NSORAN/ns-o-ran-security/results/raw/baseline}"
 MAXPAR="${1:-16}"
 SIMTIME="${SIMTIME:-30}"
 SEEDS="${SEEDS:-$(seq 1 10)}"
-UES_LIST="${UES_LIST:-12 6 9}"                     # heavy and light interleaved
+UES_LIST="${UES_LIST:-12 9 6}"                     # heaviest first, so the long runs start at t=0
 MODES="${MODES:-Threshold FixedTtt DynamicTtt}"    # RAN RRM, SON1, SON2
 MIN_FREE_MB="${MIN_FREE_MB:-3000}"                 # do not start a job below this MemAvailable
 
@@ -43,8 +43,8 @@ run_one() {  # mode ues seed
 
 log "=== sweep start: commit $COMMIT, maxpar $MAXPAR, simTime $SIMTIME"
 total=0; skipped=0
-for seed in $SEEDS; do
-    for ues in $UES_LIST; do
+for ues in $UES_LIST; do
+    for seed in $SEEDS; do
         for mode in $MODES; do
             total=$((total + 1))
             if [ -f "$OUT/$mode/ues$ues/seed$(printf %02d "$seed")/DONE" ]; then
